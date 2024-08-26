@@ -26,9 +26,9 @@ int main(int argc, char *argv[]) {
         printf("usage: try './curl [url]' to make a get request.\n");
         return 1;
     }
-    
-    char* link = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.json?&limit=1&location_ids=681462&years=2020,2021,2022";
-    // Add modification options such as yeats, location_ids, limit and such
+    // "https://developer.nrel.gov/api/nsrdb/v2/solar/spectral-ondemand-download.json?"
+    char* link = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.json?&limit=1&location_ids=681462&years=2020&equipment=one_axis";
+    // Add modification options such as years, location_ids, limit and such
     char* link_key = malloc((strlen(link) + strlen(key) + strlen(email)) * sizeof(char));    
     strcat(link_key, link); 
     strcat(link_key, email);
