@@ -9,19 +9,8 @@ zipPath =  cwd +'/SolarData.zip'
 dirPath = cwd + '/Data'
 api_key = config.api_key
 email = config.email
-def main():
-    payload = "&api_key="+api_key + "&years=2021&leap_day=false&interval=60&utc=false&reason=Academic&wkt=MULTIPOINT(-106.22%2032.9741%2C-106.18%2032.9741%2C-106.1%2032.9741)"
-    payload += "&email=" + email
-    #payload = "&email=ethanray2002@gmail.com&limit=1&location_ids=681462&years=2020&equipment=one_axis&api_key=FsHVg0Q3SaooEN64zanpAnZwJ6EEZjBDLQvHZ4yD"
-    headers = {
-        'content-type': "application/x-www-form-urlencoded",
-        'cache-control': "no-cache",
-    }
-    response = requests.get(url, params=payload, headers=headers)
-    #response = requests.get(url)
-    print(response.text)
-    downloadUrl = response.json()['outputs']['downloadUrl']
-    print(downloadUrl)
+
+def downloadData(downloadUrl):
     fileName = "SolarData.zip"
     response = requests.get(downloadUrl)
     with open(fileName, mode="wb") as file:
@@ -31,11 +20,52 @@ def main():
         for member in zip.infolist():
             arr = member.filename.split("/")
             zip.extract(member, dirPath)
-            os.rename(dirPath+"/"+member.filename, dirPath+"/"+arr[1])
+            os.rename(dirPath + "/" + member.filename, dirPath + "/" + arr[1])
+    os.remove(zipPath)
 
+def extractAndClean():
+    #metadata = []
+    #metadataValues = []
+    headers = []
+    values = []
     for filename in os.scandir(dirPath):
         f = os.path.join(dirPath, filename)
         if os.path.isfile(f):
             print(f)
+            with open(f, mode="r") as file:
+                lines = file.readlines()
+                for h in range(len(lines)):
+                    line = lines[h]
+                    arr = line.split(',')
+                    if h < 3: # For headers
+                        #if len(metadata) == 0 and h == 0:
+                        #    metadata = arr
+                        #elif len(metadataValues) == 0 and h == 1:
+                        #    metadataValues = arr
+                        if len(headers) == 0 and h == 2:
+                            headers = headers + arr
+                    else:
+                        for i in range(len(headers)):
+                            if len(values) == i:
+                                values.append([])
+                            values[i].append(float(arr[i]))
+    return headers, values
+
+def main():
+    payload = "&api_key="+api_key + "&years=2021&leap_day=false&interval=60&utc=false&reason=Academic&wkt=MULTIPOINT(-106.22%2032.9741%2C-106.18%2032.9741%2C-106.1%2032.9741)"
+    payload += "&email=" + email
+    headers = {
+        'content-type': "application/x-www-form-urlencoded",
+        'cache-control': "no-cache",
+    }
+    response = requests.get(url, params=payload, headers=headers)
+    #response = requests.get(url)
+    print(response.text)
+    downloadUrl = response.json()['outputs']['downloadUrl']
+    print(downloadUrl)
+    downloadData(downloadUrl)
+    headers, values = extractAndClean()
+
+    # c type bindings here, make a stubbed function within c file that takes in the headers and values and prints them
 
 main()

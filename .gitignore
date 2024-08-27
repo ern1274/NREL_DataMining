@@ -2,3 +2,4 @@ config.py
 key.h
 curl
 __pycache__/
+Data/
