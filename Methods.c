@@ -12,7 +12,7 @@ int compare_function(const void *a,const void *b) {
 }
 
 double calcMedian(double data[], int amount) {
-    printf("Result of Median is %f" , data[amount/2]);
+    //printf("Result of Median is %f" , data[amount/2]);
     return data[amount/2];
 }
 double calcMode(double data[], int amount) {
@@ -45,7 +45,11 @@ double calcMode(double data[], int amount) {
         }
         curr_count++;
     }
-    printf("Result of Mode is %f with count %d" , mode, count);
+    if(!initial_mode) {
+        mode = curr;
+        count = curr_count;
+    }
+    //printf("Result of Mode is %f with count %d" , mode, count);
     return mode;
 }
 double calcMean(double data[], int amount) {
@@ -54,12 +58,12 @@ double calcMean(double data[], int amount) {
     {
         total += data[i];
     }
-    printf("Result of Mean is %f" , total/amount);
+    //printf("Result of Mean is %f" , total/amount);
     return total/amount;
 }
 
 void centralTendency(double data[], int amount) {
-    printf("Calculating Central Tendencies: Median, Mode, and Mean");
+    printf("Calculating Central Tendencies: Median, Mode, and Mean\n");
     qsort(data, amount, sizeof(double), compare_function);
     double median = calcMedian(data, amount);
     double mode = calcMode(data, amount);

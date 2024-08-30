@@ -2,6 +2,7 @@ from NREL_DataMining import config
 import os
 import requests
 import zipfile
+import ctypes
 
 url = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.json"
 cwd = os.getcwd()
@@ -9,6 +10,8 @@ zipPath =  cwd +'/SolarData.zip'
 dirPath = cwd + '/Data'
 api_key = config.api_key
 email = config.email
+so_file = cwd + '/analyze.so'
+cMethods = ctypes.CDLL(so_file)
 
 def downloadData(downloadUrl):
     fileName = "SolarData.zip"
@@ -64,7 +67,16 @@ def main():
     downloadUrl = response.json()['outputs']['downloadUrl']
     print(downloadUrl)
     downloadData(downloadUrl)
+
     headers, values = extractAndClean()
+    length = len(values[0])
+    c_array_type = ctypes.c_double *length
+    arr = c_array_type(*values[0])
+
+    cMethods.centralTendency.argtypes = [ctypes.Array, ctypes.c_int]
+
+
+    cMethods.centralTendency(arr, length)
 
     # c type bindings here, make a stubbed function within c file that takes in the headers and values and prints them
 
