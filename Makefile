@@ -1,10 +1,10 @@
 
 default: build
 build: clean
-	gcc -Wall -o curl main.c util.c -lcurl
+	gcc -Wall -o analyze main.c -lcurl
 
 clean:
-	rm -rf curl
+	rm -rf analyze
 
 test: build
-	./curl https://freegeoip.app/json/ 
+	./analyze https://freegeoip.app/json/ 

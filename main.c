@@ -1,61 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <curl/curl.h>
-#include "util.h"
-#include "key.h"
-#include <regex.h>    
 
-extern char *key;
-extern char *email;
-
-// Considering REGEX for data tokenization
-void printData(char *data) {
-    char *token;
-	if(data == NULL) {
-        printf("Null data");
-        return ;
-    }
-	while ((token = strsep(&data, ",")) != NULL) {
-        printf("%s\n", token);
-    }
+int compare_function(const void *a,const void *b) {
+    double *x = (double *) a;
+    double *y = (double *) b;
+    if (*x < *y) { return -1; }
+    else if (*x > *y) { return 1; }
+    return 0;
 }
 
-int main(int argc, char *argv[]) {
-    if( argc != 2 ) {
-        printf("usage: try './curl [url]' to make a get request.\n");
-        return 1;
-    }
-    // "https://developer.nrel.gov/api/nsrdb/v2/solar/spectral-ondemand-download.json?"
-    char* link = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.json?&limit=1&location_ids=681462&years=2020&equipment=one_axis";
-    // Add modification options such as years, location_ids, limit and such
-    char* link_key = malloc((strlen(link) + strlen(key) + strlen(email)) * sizeof(char));    
-    strcat(link_key, link); 
-    strcat(link_key, email);
-    strcat(link_key, key);
+double calcMedian(double data[], int amount) {
+    printf("Result of Median is %f" , data[amount/2]);
+    return data[amount/2];
+}
+double calcMode(double data[], int amount) {
+    double mode;
 
-    struct MemoryStruct chunk;
-    chunk.memory = malloc(1);
-    chunk.size = 0;
-
-    CURL *curl_handle = curl_easy_init();
-    if(curl_handle) {
-        printf("\nLink: %s", link_key);
-        curl_easy_setopt(curl_handle, CURLOPT_URL, link_key);
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
-
-        CURLcode res = curl_easy_perform(curl_handle);
-
-        if(res != CURLE_OK) {
-            fprintf(stderr, "error: %s\n", curl_easy_strerror(res));
-        } else {
-            printf("\nSize: %lu\n", (unsigned long)chunk.size);
-            printData(chunk.memory);
-            //printf("\nData: %s\n", chunk.memory);
+    int count = 0;
+    double curr;
+    int curr_count = 0;
+    bool initial_curr = false;
+    bool initial_mode = false;
+    for (int i = 0; i < amount; i++)
+    {
+        if(!initial_curr) {
+            initial_curr = true;
+            curr = data[i];
         }
-        curl_easy_cleanup(curl_handle);
-        free(chunk.memory);
+        if(data[i] != curr) {
+            if(!initial_mode) {
+                initial_mode = true;
+                mode = curr;
+                count = curr_count;
+            } else {
+                if(curr_count > count) {
+                    mode = curr;
+                    count = curr_count;
+                }
+            }
+            curr = data[i];
+            curr_count = 0;
+        }
+        curr_count++;
     }
-    return 0;
+    printf("Result of Mode is %f with count %d" , mode, count);
+    return mode;
+}
+double calcMean(double data[], int amount) {
+    double total = 0;
+    for (int i = 0; i < amount; i++)
+    {
+        total += data[i];
+    }
+    printf("Result of Mean is %f" , total/amount);
+    return total/amount;
+}
+
+void centralTendency(double data[], int amount) {
+    printf("Calculating Central Tendencies: Median, Mode, and Mean");
+    qsort(data, amount, sizeof(double), compare_function);
+    double median = calcMedian(data, amount);
+    double mode = calcMode(data, amount);
+    double mean = calcMean(data, amount);
+    printf("Results: \nMedian: %f \nMode: %f \nMean: %f", median, mode, mean);
+}
+int main(int argc, char *argv[]) {
+    printf("Main");
 }
