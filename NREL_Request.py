@@ -1,3 +1,12 @@
+"""
+File: NREL_Request.py
+Description: A program that performs Extract, Transform and Load operations
+            on solar data from NREL and calls functions to analyze
+            data using data mining methods
+Language: Python 3.8
+Author: Ethan Ray Nunez     ern1274@rit.edu
+"""
+
 from NREL_DataMining import config
 import os
 import requests
@@ -13,6 +22,11 @@ email = config.email
 so_file = cwd + '/analyze.so'
 cMethods = ctypes.CDLL(so_file)
 
+"""
+downloadData: String( A )
+    where A is the download link for a zipfile. 
+    Once zip file is downloaded, files within are unpacked and stored 
+"""
 def downloadData(downloadUrl):
     fileName = "SolarData.zip"
     response = requests.get(downloadUrl)
@@ -25,7 +39,13 @@ def downloadData(downloadUrl):
             zip.extract(member, dirPath)
             os.rename(dirPath + "/" + member.filename, dirPath + "/" + arr[1])
     os.remove(zipPath)
-
+"""
+extractAndClean: () -> List(String), List(List(float))
+    Must be called after downloadData function, iterates lines in each FILE within the Data folder
+    and extracts and stores each value from their respective file into a data structure.
+    
+    Returns the list of headers and an array of arrays of values for each header
+"""
 def extractAndClean():
     #metadata = []
     #metadataValues = []
@@ -53,7 +73,11 @@ def extractAndClean():
                                 values.append([])
                             values[i].append(float(arr[i]))
     return headers, values
-
+"""
+main: 
+    Forms a data request based on pre-established values and calls functions 
+    to download data, extract, clean and conduct data analysis on NREL Solar Data
+"""
 def main():
     payload = "&api_key="+api_key + "&years=2021&leap_day=false&interval=60&utc=false&reason=Academic&wkt=MULTIPOINT(-106.22%2032.9741%2C-106.18%2032.9741%2C-106.1%2032.9741)"
     payload += "&email=" + email
@@ -77,7 +101,5 @@ def main():
 
 
     cMethods.centralTendency(arr, length)
-
-    # c type bindings here, make a stubbed function within c file that takes in the headers and values and prints them
 
 main()

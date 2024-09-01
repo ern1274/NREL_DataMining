@@ -1,8 +1,23 @@
+/*
+ * File: Methods.c
+ * 
+ * Desc: Data Analysis methods for use in other files 
+ * given the parameters passed in for respective method are appropriate
+ * 
+ * Author: Ethan Nunez     ern1274@rit.edu
+ *          
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
+/**
+* Compares two doubles and returns values based on 'a' left hand side and 'b' right hand side
+* @param a first double to compare
+* @param b second double to compare
+* @return returns either 1, -1, or 0 based on 'a' relative to 'b'
+*/
 int compare_function(const void *a,const void *b) {
     double *x = (double *) a;
     double *y = (double *) b;
@@ -10,11 +25,22 @@ int compare_function(const void *a,const void *b) {
     else if (*x > *y) { return 1; }
     return 0;
 }
-
+/**
+* Calculates Median given sorted double array and its length
+* @param data array of doubles
+* @param amount length of data array
+* @return returns the data in the middle of the array
+*/
 double calcMedian(double data[], int amount) {
     //printf("Result of Median is %f" , data[amount/2]);
     return data[amount/2];
 }
+/**
+* Calculates Mode given sorted double array and its length
+* @param data array of doubles
+* @param amount length of data array
+* @return returns the data with the highest reoccurrence in the array
+*/
 double calcMode(double data[], int amount) {
     double mode;
 
@@ -52,6 +78,12 @@ double calcMode(double data[], int amount) {
     //printf("Result of Mode is %f with count %d" , mode, count);
     return mode;
 }
+/**
+* Calculates Mean given sorted double array and its length
+* @param data array of doubles
+* @param amount length of data array
+* @return returns the sum of all values in data array divided by its amount/length
+*/
 double calcMean(double data[], int amount) {
     double total = 0;
     for (int i = 0; i < amount; i++)
@@ -61,7 +93,12 @@ double calcMean(double data[], int amount) {
     //printf("Result of Mean is %f" , total/amount);
     return total/amount;
 }
-
+/**
+* Sorts the data array in ascending order and
+* calculates Median, Mode and Mean values of said array and prints it
+* @param data array of doubles
+* @param amount length of data array
+*/
 void centralTendency(double data[], int amount) {
     printf("Calculating Central Tendencies: Median, Mode, and Mean\n");
     qsort(data, amount, sizeof(double), compare_function);
