@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 int compare_function(const void *a,const void *b);
 

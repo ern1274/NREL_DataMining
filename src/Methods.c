@@ -33,7 +33,15 @@ int compare_function(const void *a,const void *b) {
 * @return returns the data in the middle of the array
 */
 double calcMedian(double data[], int amount) {
-    //printf("Result of Median is %f" , data[amount/2]);
+    if(amount < 1) {
+        return -1;
+    }
+    /*else if(amount == 1) {
+        return data[amount-1];
+    }*/
+    else if(amount % 2 == 0) {
+        return (data[amount/2] + data[(amount/2) - 1]) / 2;
+    }
     return data[amount/2];
 }
 /**
