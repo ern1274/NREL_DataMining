@@ -20,6 +20,6 @@ Link to Unity Website: https://www.throwtheswitch.org/unity
 
 Unity's files were not included in this repository due to the amount of files, the use of unity and its files can be seen in the test file headers and Makefile configuration. 
 
-To call for unit testing, this line was used 'make test'
+To call for unit testing, this line was used `make test`
 
 That line results in a new directory called build which holds the results of the tests ran as well as the necessary components needed to make unity work. 
