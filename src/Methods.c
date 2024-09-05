@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "Methods.h"
 
 /**
 * Compares two doubles and returns values based on 'a' left hand side and 'b' right hand side
@@ -107,6 +108,6 @@ void centralTendency(double data[], int amount) {
     double mean = calcMean(data, amount);
     printf("Results: \nMedian: %f \nMode: %f \nMean: %f", median, mode, mean);
 }
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
     printf("Main");
-}
+}*/
