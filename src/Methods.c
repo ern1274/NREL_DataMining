@@ -51,8 +51,10 @@ double calcMedian(double data[], int amount) {
 * @return returns the data with the highest reoccurrence in the array
 */
 double calcMode(double data[], int amount) {
+    if(amount < 1) {
+        return -1;
+    }
     double mode;
-
     int count = 0;
     double curr;
     int curr_count = 0;
@@ -94,6 +96,9 @@ double calcMode(double data[], int amount) {
 * @return returns the sum of all values in data array divided by its amount/length
 */
 double calcMean(double data[], int amount) {
+    if(amount < 1) {
+        return -1;
+    }
     double total = 0;
     for (int i = 0; i < amount; i++)
     {
