@@ -23,3 +23,14 @@ Unity's files were not included in this repository due to the amount of files, t
 To call for unit testing, this line was used `make test`
 
 That line results in a new directory called build which holds the results of the tests ran as well as the necessary components needed to make unity work. 
+
+Geocoding:
+
+For geocoding addresses into variables for latitude and longitude, I used positionstack api on the free basic plan with 
+a limit of 25,000 requests per month. 
+
+To use this api, I use an HTTP request model and convert it from a JSON object to a dictionary
+
+Only latitude and longitude from the dictionary/JSON data is used in this project. 
+
+Documentation regarding positionstack geocoding api can be found here: https://positionstack.com/documentation
