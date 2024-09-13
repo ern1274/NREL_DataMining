@@ -14,7 +14,7 @@ import pandas as pd
 import http.client, urllib.parse
 import json
 
-url = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-download.csv?"
+url = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.csv?"
 query_api_key = config.query_api_key
 geocode_api_key = config.geocode_api_key
 email = config.email
@@ -45,28 +45,46 @@ def geocodeAddress(region, country):
     lat, lon = jDict['latitude'], jDict['longitude']
     return [lon, lat] # supposed to be ordered lon then lat
 
+def locationRequests():
+    points = []
+    regions = []
+    while(True):
+        addLoc = input("Add Region and Country? 'Y/y': Yes, 'N/n' : No ==> ")
+        if str.lower(addLoc) == 'y':
+            region = input("What region are you adding? ==> ")
+            country = input("What country is this region located in? ==> ")
+            point = geocodeAddress(region,country)
+            if point is not None:
+                regions.append(region+', '+country)
+                points.append(point)
+            else:
+                print("Region " + region + " within Country " + country + " did not exist and couldn't be geocoded")
+        elif str.lower(addLoc) == 'n':
+            break
+        else:
+            print("Didn't recognize command, please try again")
+    return points, regions
+
+
 """
 convertPointsToString: 
     Given multiple longitude and latitude points, convert it into string used for the next API request
     returned string contains every point separated by commas and spaces(for every pair of points)
 """
 def convertPointsToString(points):
-    string = ""
-    for i in range(len(points)):
-        point = points[i]
-        string += str(point[0]) +'%20'+ str(point[1])
-        if i != len(points) - 1:
-            string += "%2C"
-    return string
+    strings = []
+    for point in points:
+        strings.append(str(point[0]) +'%20'+ str(point[1]))
+    return strings
 
 """
 exportToDF: 
     Forms a data request based on pre-established values and downloads data
     into pandas DataFrame object and returns it
 """
-def exportToDF(points):
+def exportToDF(points, regions):
     lat, lon, year = 32.9741,-106.2, 2020
-    point_to_string = convertPointsToString(points)
+    points = convertPointsToString(points)
     # Set the attributes to extract (e.g., dhi, ghi, etc.), separated by commas.
     attributes = 'ghi,dhi,dni,wind_speed,air_temperature,solar_zenith_angle'
     # Choose year of data
@@ -86,32 +104,38 @@ def exportToDF(points):
     # Your affiliation
     your_affiliation = 'Rochester+Institute+of+Technology'
     email = 'ethanray2002@gmail.com'
+    regional_dfs = []
+    for i in range(len(points)):
+        point = points[i]
+        link = url+'&api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
+            year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email, attr=attributes)
 
-    link = url+'&api_key={api}&wkt=MULTIPOINT({points})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
-        year=year, points=point_to_string, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email, attr=attributes)
-    # Return just the first 2 lines to get metadata:
-    #print(link)
-    info = pd.read_csv(link, nrows=1)
-    # See metadata for specified properties, e.g., timezone and elevation
-    timezone, elevation = info['Local Time Zone'], info['Elevation']
-    #print(info)
-    df = pd.read_csv(
-        url+'api_key={api}&wkt=MULTIPOINT({points})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
-            year=year, points=point_to_string, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email,
-            attr=attributes), skiprows=2)
-    #print(df.columns.values)
-    #print(df['Temperature'].values)
-    return df
+        # Return just the first 2 lines to get metadata:
+        print(link)
+        info = pd.read_csv(link, nrows=1)
+        # See metadata for specified properties, e.g., timezone and elevation
+        timezone, elevation = info['Local Time Zone'], info['Elevation']
+        print(info)
+        df = pd.read_csv(
+            url+'api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
+                year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email,
+                attr=attributes), skiprows=2)
+        regional_dfs.append(df)
+        print("Region and Country "+regions[i] + " df downloaded")
+    return regional_dfs
 
 """
 main: 
     Gets pandas df and conducts data mining methods on given data
 """
 def main():
-    point = geocodeAddress('Austin', 'US')
+    points, regions = locationRequests()
+    #point = geocodeAddress('Austin', 'US')
+    point = geocodeAddress('California', 'US')
+    points.append(point)
+    regions.append('California, US')
     #print("latitude and longitude of Austin in the US: " + str(point[0]) +"," + str(point[1]))
-
-    df = exportToDF([point])
+    df = exportToDF(points, regions)
     '''values = df['Year'].values
     length = len(values)
     c_array_type = ctypes.c_double *length
