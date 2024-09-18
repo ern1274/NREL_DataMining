@@ -7,7 +7,7 @@ Language: Python 3.8
 Author: Ethan Ray Nunez     ern1274@rit.edu
 """
 
-from NREL_DataMining.src import config
+from NREL_DataMining.src import config, Data_Preprocess
 import os
 import ctypes
 import pandas as pd
@@ -15,6 +15,8 @@ import http.client, urllib.parse
 import json
 
 url = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-2-2-download.csv?"
+#url = "https://developer.nrel.gov/api/nsrdb_api/solar/spectral_ondemand_download.json?"
+#above url requires data to be downloaded from zip and requires equipment=one_axis as parameter
 query_api_key = config.query_api_key
 geocode_api_key = config.geocode_api_key
 email = config.email
@@ -48,14 +50,15 @@ def geocodeAddress(region, country):
 def locationRequests():
     points = []
     regions = []
-    while(True):
+    print("Only country available is the US due to difficulties requesting international api data")
+    while True:
         addLoc = input("Add Region and Country? 'Y/y': Yes, 'N/n' : No ==> ")
         if str.lower(addLoc) == 'y':
             region = input("What region are you adding? ==> ")
             country = input("What country is this region located in? ==> ")
             point = geocodeAddress(region,country)
             if point is not None:
-                regions.append(region+', '+country)
+                regions.append(region+','+country)
                 points.append(point)
             else:
                 print("Region " + region + " within Country " + country + " did not exist and couldn't be geocoded")
@@ -104,41 +107,72 @@ def exportToDF(points, regions):
     # Your affiliation
     your_affiliation = 'Rochester+Institute+of+Technology'
     email = 'ethanray2002@gmail.com'
-    regional_dfs = []
+    country_dfs = {}
     for i in range(len(points)):
         point = points[i]
+        region, country = regions[i].split(',')
+        #print(region)
+        #print(country)
+        if country not in country_dfs.keys():
+            country_dfs[country] = {}
         link = url+'&api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
             year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email, attr=attributes)
 
         # Return just the first 2 lines to get metadata:
-        print(link)
+        #print(link)
         info = pd.read_csv(link, nrows=1)
         # See metadata for specified properties, e.g., timezone and elevation
-        timezone, elevation = info['Local Time Zone'], info['Elevation']
-        print(info)
+        #timezone, elevation = info['Local Time Zone'], info['Elevation']
+        #print(info)
         df = pd.read_csv(
             url+'api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
                 year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email,
                 attr=attributes), skiprows=2)
-        regional_dfs.append(df)
+        country_dfs[country][region] = df
         print("Region and Country "+regions[i] + " df downloaded")
-    return regional_dfs
+    return country_dfs
 
 """
 main: 
     Gets pandas df and conducts data mining methods on given data
 """
 def main():
-    points, regions = locationRequests()
-    #point = geocodeAddress('Austin', 'US')
+    #points, regions = locationRequests()
+    points = []
+    regions = []
+    #point = geocodeAddress('Texas', 'US')
+    #points.append(point)
     point = geocodeAddress('California', 'US')
     points.append(point)
-    regions.append('California, US')
-    #print("latitude and longitude of Austin in the US: " + str(point[0]) +"," + str(point[1]))
+    #regions.append('Texas,US')
+    regions.append('California,US')
     df = exportToDF(points, regions)
-    '''values = df['Year'].values
+    month_df = Data_Preprocess.organize_by_month(df)
+    #print(month_df)
+    for month in month_df['ALL'].keys():
+        print("The " + str(month + 1) + "st Month\n")
+        for i in range(5):
+            entry = month_df['ALL'][month][i]
+            print(entry)
+    '''
+    for country in df.keys():
+        for region in df[country].keys():
+            regional_df = df[country][region]
+            for index, row in regional_df.iterrows():
+                print(row["Name"], row["Age"])
+            for attribute in regional_df.keys():
+                print("\nAttribute: " + attribute)
+                values = regional_df[attribute].values
+                length = len(values)
+                c_array_type = ctypes.c_double * length
+                arr = c_array_type(*values)
+
+                cMethods.centralTendency.argtypes = [ctypes.Array, ctypes.c_int]
+
+                cMethods.centralTendency(arr, length)
+    values = df['Year'].values
     length = len(values)
-    c_array_type = ctypes.c_double *length
+    c_array_type = ctypes.c_double * length
     arr = c_array_type(*values)
 
     cMethods.centralTendency.argtypes = [ctypes.Array, ctypes.c_int]
