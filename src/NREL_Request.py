@@ -27,14 +27,14 @@ def main():
     #regions.append('Texas,US')
     regions.append('California,US')
     df = NREL.exportToDF(points, regions)
-    month_df = Data_Preprocess.organize_by_month(df)
-    #print(month_df)
-    for month in month_df['ALL'].keys():
-        print("The " + str(month + 1) + "st Month\n")
+    attribute_df = Data_Preprocess.organize_by_wind_speed(df)
+    #gitprint(month_df)
+    for attribute in attribute_df['ALL'].keys():
+        print(attribute)
         for i in range(5):
-            entry = month_df['ALL'][month][i]
+            entry = attribute_df['ALL'][attribute][i]
             print(entry)
-    for country in df.keys():
+    '''for country in df.keys():
         for region in df[country].keys():
             regional_df = df[country][region]
             for index, row in regional_df.iterrows():
@@ -58,6 +58,6 @@ def main():
 
 
     cMethods.centralTendency(arr, length)
-
+    '''
 
 main()
