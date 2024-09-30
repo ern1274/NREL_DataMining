@@ -200,8 +200,8 @@ class MyTestCase(unittest.TestCase):
                              '2020': {'2': [pd.Series(data=['2','2020'], index=['Month', 'Year'], dtype=object)]},
                              '2021': {'3': [pd.Series(data=['3','2021'], index=['Month', 'Year'], dtype=object)]}}
         result_df = Organizer.organize_by_attr(test_df, attributes)
-        #Testing below heavily requires testing on two attributes, if any more attributes are added to this test
-        #Add a inner loop for each added attribute to ensure that the dictionary arrives at the array of Series.
+        #Testing below heavily depends on testing with two attributes, if any more attributes are added/removed to this test
+        #Add/Remove a inner loop for each added/removed attribute to ensure that the dictionary arrives at the array of Series.
         # Example: attributes: ['Year', 'Month', 'Temp']
         # for each year in df.keys:
         #       for each month in df[year].keys:
