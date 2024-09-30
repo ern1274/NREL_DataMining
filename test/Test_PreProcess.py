@@ -171,5 +171,49 @@ class MyTestCase(unittest.TestCase):
             result_entry = result_us_cali[index]
             for h in range(len(actual_entry)):
                 self.assertTrue(actual_entry[h].equals(result_entry[h]))
+    def test_attribute_assignment_recurse(self):
+        attributes = ['Year', 'Month']
+        test_df = pd.DataFrame({'Month': ['1', '2', '3'],
+                      'Year': ['2019', '2020', '2021']
+                      })
+        actual_df = [{'2019':{'1': [pd.Series(data=['1','2019'], index=['Month','Year'], dtype=object)]}},
+                     {'2020':{'2': [pd.Series(data=['2','2020'], index=['Month','Year'], dtype=object)]}},
+                     {'2021':{'3': [pd.Series(data=['3','2021'], index=['Month','Year'], dtype=object)]}}]
+        for index, row in test_df.iterrows():
+            result_lst = Organizer.attribute_assignment_recurse(row, 0, attributes)
+            actual_lst = actual_df[index]
+            for key in result_lst.keys():
+                actual_entry = actual_lst[key]
+                result_entry = result_lst[key]
+                for secondary in result_entry.keys():
+                    actual_sec = actual_entry[secondary]
+                    result_sec = result_entry[secondary]
+                    for i in range(len(result_sec)):
+                        self.assertTrue(result_sec[i].equals(actual_sec[i]))
+
+    def test_organize_by_attr(self):
+        attributes = ['Year', 'Month']
+        test_df = pd.DataFrame({'Month': ['1', '2', '3'],
+                          'Year': ['2019', '2020', '2021']
+                          })
+        actual_df = {'2019': {'1': [pd.Series(data=['1','2019'], index=['Month','Year'], dtype=object)]},
+                             '2020': {'2': [pd.Series(data=['2','2020'], index=['Month', 'Year'], dtype=object)]},
+                             '2021': {'3': [pd.Series(data=['3','2021'], index=['Month', 'Year'], dtype=object)]}}
+        result_df = Organizer.organize_by_attr(test_df, attributes)
+        #Testing below heavily requires testing on two attributes, if any more attributes are added to this test
+        #Add a inner loop for each added attribute to ensure that the dictionary arrives at the array of Series.
+        # Example: attributes: ['Year', 'Month', 'Temp']
+        # for each year in df.keys:
+        #       for each month in df[year].keys:
+        #           for each temp in df[year][month].keys
+        # So on and so forth
+        for key in result_df.keys():
+            actual_entry = actual_df[key]
+            result_entry = result_df[key]
+            for secondary in result_entry.keys():
+                actual_sec = actual_entry[secondary]
+                result_sec = result_entry[secondary]
+                for i in range(len(result_sec)):
+                    self.assertTrue(result_sec[i].equals(actual_sec[i]))
 if __name__ == '__main__':
     unittest.main()
