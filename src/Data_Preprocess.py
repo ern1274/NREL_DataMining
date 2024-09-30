@@ -1,4 +1,10 @@
+"""
+organize_by_month:
+    Organizes pandas DataFrame data by month.
+    The dataframe will formated into the result as follows: {'ALL': {}, 'US':{'California:{}}}
+    in the format above, each 'empty' dictionary has months as its keys and each respective months data.
 
+"""
 def organize_by_month(df):
     organized_df = {'ALL': {}}
     # 'ALL' IS A MONTH DICT NOT REGION DICT consisting of all data organized regardless of region
@@ -26,6 +32,14 @@ def organize_by_month(df):
             organized_df['ALL'] = {**organized_df['ALL'], **lst}
     return organized_df
 
+
+"""
+organize_by_year: 
+    Organizes pandas DataFrame data by year.
+    The dataframe will formated into the result as follows: {'ALL': {}, 'US':{'California:{}}}
+    in the format above, each 'empty' dictionary has years as its keys and each respective years data. 
+
+"""
 def organize_by_year(df):
     organized_df = {'ALL': {}}
     # 'ALL' IS A YEAR DICT NOT REGION DICT consisting of all data organized regardless of region
@@ -51,7 +65,11 @@ def organize_by_year(df):
 
             organized_df['ALL'] = {**organized_df['ALL'], **lst}
     return organized_df
-
+"""
+assign_temp_bucket: 
+    Given a decimal number in form of string, 
+    return a label with their respective temperature range
+"""
 def assign_temp_bucket(temp):
     #temp is string, have to convert to double then assign.
     temp = float(temp)
@@ -66,6 +84,14 @@ def assign_temp_bucket(temp):
     else:
         return '>100'
 
+
+"""
+organize_by_temperature: 
+    Organizes pandas DataFrame data by temperature.
+    The dataframe will formated into the result as follows: {'ALL': {}, 'US':{'California:{}}}
+    in the format above, each 'empty' dictionary has temperature as its keys and each respective temperature data. 
+
+"""
 def organize_by_temperature(df):
     organized_df = {'ALL': {}}
     # 'ALL' IS A MONTH DICT NOT REGION DICT consisting of all data organized regardless of region
@@ -91,7 +117,11 @@ def organize_by_temperature(df):
 
             organized_df['ALL'] = {**organized_df['ALL'], **lst}
     return organized_df
-
+"""
+assign_wind_bucket: 
+    Given a decimal number in form of string, 
+    return a label with their respective wind speed range
+"""
 def assign_wind_bucket(temp):
     #temp is string, have to convert to double then assign.
     temp = float(temp)
@@ -105,7 +135,13 @@ def assign_wind_bucket(temp):
         return 'Storm - Hurricane Forces'
     else:
         return 'Beyond Hurricane Forces'
+"""
+organize_by_wind_speed: 
+    Organizes pandas DataFrame data by Wind Speed.
+    The dataframe will formated into the result as follows: {'ALL': {}, 'US':{'California:{}}}
+    in the format above, each 'empty' dictionary has Wind Speed as its keys and each respective Wind Speed data. 
 
+"""
 def organize_by_wind_speed(df):
     organized_df = {'ALL': {}}
     # 'ALL' IS A MONTH DICT NOT REGION DICT consisting of all data organized regardless of region
@@ -131,7 +167,11 @@ def organize_by_wind_speed(df):
 
             organized_df['ALL'] = {**organized_df['ALL'], **lst}
     return organized_df
-
+"""
+bucket_data: 
+    Given a piece of data in form of string and attribute to classify the data, 
+    return a label with their respective attribute
+"""
 def bucket_data(attribute, data):
     if attribute == 'Month':
         return data
@@ -143,7 +183,13 @@ def bucket_data(attribute, data):
         return assign_wind_bucket(data)
     print("Attribute doesn't exist yet")
     return data
-
+"""
+attribute_assignment_recurse: 
+    Given a Pandas row of data, attributes to classify the row, 
+    and index to indicate which attribute
+    for each attribute, assign attribute label and recurse to assign the rest of attribute label
+    if at the end of an attributes, return the row in an array. 
+"""
 def attribute_assignment_recurse(row, index, attributes):
     if index == len(attributes):
         return [row]
@@ -153,14 +199,24 @@ def attribute_assignment_recurse(row, index, attributes):
         return attribute_assignment_recurse(row, index+1, attributes)
     data = bucket_data(atr, row[atr])
     return {data: attribute_assignment_recurse(row, index+1, attributes)}
-
+"""
+organize_by_attr:
+    Given a dataframe, iterate each row and call recursive function to organize each row
+    and culminate each row
+    returns a organized dataframe organized by passed in attributes array
+"""
 def organize_by_attr(df, attributes):
     organized_df = {}
     for index, row in df.iterrows():
         lst = attribute_assignment_recurse(row, 0, attributes)
         organized_df = {**organized_df, **lst}
     return organized_df
-
+"""
+organize_dfs:
+    given multiple regional DataFrames, and a list of attributes to organize the data by.
+    organize each regional dataframe individually and culminate them into a larger dataframe
+    'ALL' keyword refers to all organized data irrespective of region and country
+"""
 def organize_dfs(dfs, attributes):
     organized_df = {'ALL': {}}
     for country in dfs.keys():
