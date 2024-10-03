@@ -6,9 +6,11 @@ Description: A program that performs Extract, Transform and Load operations
 Language: Python 3.8
 Author: Ethan Ray Nunez     ern1274@rit.edu
 """
-from NREL_DataMining.src import Data_Preprocess ,NREL_Methods as NREL
+import NREL_DataMining.src.Data_Preprocess as Preprocess ,NREL_DataMining.src.NREL_Methods as NREL
+import NREL_DataMining.src.apriori_NREL as apriori
 import ctypes
 import os
+
 so_file = os.getcwd() + '/analyze.so'
 cMethods = ctypes.CDLL(so_file)
 
@@ -27,13 +29,12 @@ def main():
     #regions.append('Texas,US')
     regions.append('California,US')
     df = NREL.exportToDF(points, regions)
-    attribute_df = Data_Preprocess.organize_by_wind_speed(df)
+    attribute_df = Preprocess.organize_dfs(df, [])
     #gitprint(month_df)
-    for attribute in attribute_df['ALL'].keys():
-        print(attribute)
-        for i in range(5):
-            entry = attribute_df['ALL'][attribute][i]
-            print(entry)
+    #print("Printing")
+    #print(attribute_df['ALL'])
+    apriori.prep(attribute_df['ALL'])
+    print("Done")
     '''for country in df.keys():
         for region in df[country].keys():
             regional_df = df[country][region]

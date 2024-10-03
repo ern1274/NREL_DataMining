@@ -181,7 +181,7 @@ def bucket_data(attribute, data):
         return assign_temp_bucket(data)
     elif attribute == 'Wind Speed':
         return assign_wind_bucket(data)
-    print("Attribute doesn't exist yet")
+    #print("Attribute doesn't exist yet")
     return data
 """
 attribute_assignment_recurse: 
@@ -221,11 +221,15 @@ def organize_dfs(dfs, attributes):
     organized_df = {'ALL': {}}
     for country in dfs.keys():
         if country not in organized_df.keys():
-            organized_df = {}
-        result = {}
+            organized_df[country] = {}
         for region in dfs[country].keys():
             regional_df = dfs[country][region]
-            result = organize_by_attr(regional_df, attributes)
-            organized_df[country][region] = result
-        organized_df['ALL'] = {**organized_df['ALL'], **result}
+            if len(attributes) != 0:
+                result = organize_by_attr(regional_df, attributes)
+                organized_df[country][region] = result
+                organized_df['ALL'] = {**organized_df['ALL'], **result}
+            else:
+                organized_df[country][region] = regional_df
+                organized_df['ALL'] = {**organized_df['ALL'], **regional_df}
+
     return organized_df
