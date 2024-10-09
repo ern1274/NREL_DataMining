@@ -181,6 +181,10 @@ def bucket_data(attribute, data):
         return assign_temp_bucket(data)
     elif attribute == 'Wind Speed':
         return assign_wind_bucket(data)
+    elif attribute == 'DNI':
+        return round(data/100,1)*100
+    elif attribute == 'GHI':
+        return round(data/100,1)*100
     #print("Attribute doesn't exist yet")
     return data
 """

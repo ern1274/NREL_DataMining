@@ -7,7 +7,7 @@ Language: Python 3.8
 Author: Ethan Ray Nunez     ern1274@rit.edu
 """
 import NREL_DataMining.src.Data_Preprocess as Preprocess ,NREL_DataMining.src.NREL_Methods as NREL
-import NREL_DataMining.src.apriori_NREL as apriori
+import NREL_DataMining.src.NREL_DataMethods as DM
 import ctypes
 import os
 
@@ -33,7 +33,7 @@ def main():
     #gitprint(month_df)
     #print("Printing")
     #print(attribute_df['ALL'])
-    apriori.prep(attribute_df['ALL'])
+    DM.prep_apriori(attribute_df['ALL'])
     print("Done")
     '''for country in df.keys():
         for region in df[country].keys():
