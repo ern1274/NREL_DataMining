@@ -33,7 +33,8 @@ def main():
     #gitprint(month_df)
     #print("Printing")
     #print(attribute_df['ALL'])
-    DM.prep_apriori(attribute_df['ALL'])
+    #DM.prep_apriori(attribute_df['ALL'])
+    DM.prep_clustering(attribute_df['ALL'])
     print("Done")
     '''for country in df.keys():
         for region in df[country].keys():
