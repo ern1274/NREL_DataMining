@@ -113,13 +113,18 @@ double calcMean(double data[], int amount) {
 * @param data array of doubles
 * @param amount length of data array
 */
-void centralTendency(double data[], int amount) {
-    printf("Calculating Central Tendencies: Median, Mode, and Mean\n");
+double* centralTendency(double data[], int amount) {
+    //printf("Calculating Central Tendencies: Median, Mode, and Mean\n");
     qsort(data, amount, sizeof(double), compare_function);
     double median = calcMedian(data, amount);
     double mode = calcMode(data, amount);
     double mean = calcMean(data, amount);
-    printf("Results: \nMedian: %f \nMode: %f \nMean: %f", median, mode, mean);
+    //printf("Results: \nMedian: %f \nMode: %f \nMean: %f", median, mode, mean);
+    static double result[3];
+    result[0] = median;
+    result[1] = mode;
+    result[2] = mean;
+    return result;
 }
 /*int main(int argc, char *argv[]) {
     printf("Main");

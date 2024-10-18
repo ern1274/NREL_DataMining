@@ -15,6 +15,24 @@ def prep_clustering(data):
     item_attribs = ['Solar Zenith Angle','Temperature', 'GHI', 'DHI']
     class_attribute = 'DNI'
     k = 10
-    k_cluster.k_means_clustering(k,df,item_attribs,class_attribute)
+    #cluster_info, k_means_info = k_cluster.k_means_clustering(k,df,item_attribs,class_attribute)
+    #print("Total points: ", k_means_info[0])
+    #print('Centroid: ', k_means_info[1])
+    #print('Silhouette Coefficient: ', k_means_info[2])
+    #print('H(U) = ', k_means_info[3])
+    #print('H(V) = ', k_means_info[4])
+    #print('MI(U, V) = ', k_means_info[5])
+    #print('AMI(U, V) = ', k_means_info[6])
+    #print('MIDIST(U,V) = ', k_means_info[7])
+    #print('AMIDIST(U,V) = ', k_means_info[8])
+    #for i in range(0, len(cluster_info)):
+    #    print("Cluster: ", i, "; Histogram: ", cluster_info[i][2])
+    #    for h in range(len(cluster_info[i][0])):
+    #        print("Attribute: " + str(cluster_info[i][0][h]))
+    #        print("Tendencies:")
+    #        print("Median: " + str(cluster_info[i][1][h][0]))
+    #       print("Mode: " + str(cluster_info[i][1][h][1]))
+    #        print("Mean: " + str(cluster_info[i][1][h][2]))
+
     k_cluster.agglo_clustering(k, df)
 
