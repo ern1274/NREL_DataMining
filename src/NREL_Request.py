@@ -36,30 +36,5 @@ def main():
     #DM.prep_apriori(attribute_df['ALL'])
     DM.prep_clustering(attribute_df['ALL'])
     print("Done")
-    '''for country in df.keys():
-        for region in df[country].keys():
-            regional_df = df[country][region]
-            for index, row in regional_df.iterrows():
-                print(row["Name"], row["Age"])
-            for attribute in regional_df.keys():
-                print("\nAttribute: " + attribute)
-                values = regional_df[attribute].values
-                length = len(values)
-                c_array_type = ctypes.c_double * length
-                arr = c_array_type(*values)
-
-                cMethods.centralTendency.argtypes = [ctypes.Array, ctypes.c_int]
-
-                cMethods.centralTendency(arr, length)
-    values = df['Year'].values
-    length = len(values)
-    c_array_type = ctypes.c_double * length
-    arr = c_array_type(*values)
-
-    cMethods.centralTendency.argtypes = [ctypes.Array, ctypes.c_int]
-
-
-    cMethods.centralTendency(arr, length)
-    '''
 
 main()

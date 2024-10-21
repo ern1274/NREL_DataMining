@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, OrdinalEncoder, 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, mutual_info_score, adjusted_mutual_info_score
 from scipy.stats import entropy
-import scipy.cluster.hierarchy as shc
+#import scipy.cluster.hierarchy as shc
 import ctypes
 import os
 
@@ -37,7 +37,6 @@ def cluster_central_tendency(df):
 
 def k_means_clustering(k, df, attributes, class_attribute):
     # Data must be scaled due to the difference in potential x-axis values and y-axis values
-    # A Min Max Scaler is an option
     min_max_scaler = MinMaxScaler()
 
     for a in attributes:

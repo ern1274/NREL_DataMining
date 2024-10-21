@@ -1,9 +1,5 @@
 
 import NREL_DataMining.src.Data_Preprocess as preprocess
-# Convert this code to fit NREL dataframe and set attributes beforehand.
-# Assume you are getting one single collection of data, separation of data based upon
-# regions and/or other attirbutes are handled outside of this algorithm.
-# This reduces complexity
 
 class Itemset:
     def __init__(self, items, count):
@@ -76,9 +72,6 @@ def apriori(k, data, item_attribs, minsup):
         most_occurring = Itemset([],0)
         for row in row_list:
             for candidate in candidates:
-                #print("Row and Candidate")
-                #print(row)
-                #print(candidate.items)
                 c_itemset = candidate.items
                 if set(c_itemset).issubset(row):
                     candidate.count += 1
@@ -87,16 +80,11 @@ def apriori(k, data, item_attribs, minsup):
         total_insuff_support = sum([True for h in range(len(candidates)) if candidates[h].count < minsup])
         lki = [candidates[h] for h in range(len(candidates)) if candidates[h].count >= minsup]
         print("L"+str(i)+" Finished: ")
-        #print_apriori_data(lki)
         print("Total Insufficient Support: " + str(total_insuff_support))
         print("Most Occurring itemset: ")
         print(str(most_occurring.items) + " : " + str(most_occurring.count))
     print("Returning L" + str(k))
     return lki
-
-def print_apriori_data(lk):
-    for entry in lk:
-        print(str(entry.items) + " : " + str(entry.count))
 
 
 def apriori_L1(item_attribs, df, minsup):
