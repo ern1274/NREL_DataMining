@@ -96,16 +96,21 @@ def agglo_clustering(k, df):
     X_principal = pd.DataFrame(X_principal)
     X_principal.columns = ['P1', 'P2']
 
-    plt.figure(figsize=(8, 8))
-    plt.title('Visualising the data')
-    Dendrogram = shc.dendrogram((shc.linkage(X_principal, method='ward')))
+    #plt.figure(figsize=(8, 8))
+    #plt.title('Visualising the data')
+    #Dendrogram = shc.dendrogram((shc.linkage(X_principal, method='ward')))
 
     ac2 = AgglomerativeClustering(n_clusters=k)
-
     # Visualizing the clustering
     plt.figure(figsize=(6, 6))
     plt.scatter(X_principal['P1'], X_principal['P2'],
                 c=ac2.fit_predict(X_principal), cmap='rainbow')
-    plt.show()
+    #plt.show()
+    cluster_info = []
+    for current_cluster in range(0, k):
+        points_assigned = df.iloc[(ac2.labels_ == current_cluster).nonzero()]
+        df['Cluster'] = ac2.labels_
+        attributes, tendencies = cluster_central_tendency(points_assigned)
+        cluster_info.append([attributes, tendencies])
 
-
+    return cluster_info, plt
