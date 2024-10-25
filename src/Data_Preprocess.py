@@ -1,3 +1,4 @@
+import pandas as pd
 """
 organize_by_month:
     Organizes pandas DataFrame data by month.
@@ -235,5 +236,6 @@ def organize_dfs(dfs, attributes):
             else:
                 organized_df[country][region] = regional_df
                 organized_df['ALL'] = {**organized_df['ALL'], **regional_df}
+                organized_df['ALL'] = pd.DataFrame.from_dict(organized_df['ALL'])
 
     return organized_df

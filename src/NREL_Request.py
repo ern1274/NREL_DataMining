@@ -30,11 +30,16 @@ def main():
     regions.append('California,US')
     df = NREL.exportToDF(points, regions)
     attribute_df = Preprocess.organize_dfs(df, [])
+
+    #print(attribute_df['ALL'])
+    #print(type(attribute_df['ALL']))
+    #print(type(attribute_df['US']['California']))
+
     #gitprint(month_df)
     #print("Printing")
     #print(attribute_df['ALL'])
     #DM.prep_apriori(attribute_df['ALL'])
-    DM.prep_clustering(attribute_df['ALL'])
+    #DM.prep_clustering(attribute_df['ALL'])
     print("Done")
 
 main()
