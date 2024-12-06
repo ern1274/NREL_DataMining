@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <title>Geocode Form</title>
 </head>
+<p>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    Regions selected so far:
+    {% for region in regions %}
+        <div class="regionIterator">
+            {{ region }}
+        </div>
+    {% endfor %}
+</p>
+
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="Add Region">
 </form>
 </html>

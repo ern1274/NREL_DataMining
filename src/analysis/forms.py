@@ -6,29 +6,31 @@ from django.utils.translation import gettext_lazy as _
 year_max_limit = 2022
 year_min_limit = 2010
 attributes = (("all","all"),
-              ("ghi","ghi"),
-              ("dhi","dhi"),
-              ("dni","dni"),
-              ("wind_speed","wind_speed"),
-              ("air_temperature","air_temperature"),
-              ("solar_zenith_angle","solar_zenith_angle"))
+              ("ghi","GHI"),
+              ("dhi","DHI"),
+              ("dni","DNI"),
+              ("wind_speed","Wind Speed"),
+              ("air_temperature","Air Temperature"),
+              ("solar_zenith_angle","Solar Zenith Angle"))
 
 class geocodeForm(forms.Form):
-    country_data = forms.CharField(help_text="Enter a Country in its abbreviated form")
+    country_data = forms.CharField(label="Enter a Country in its abbreviated form")
     def clean_country_data(self):
         data = self.cleaned_data['country_data']
         data.upper()
         return data
-    region_data = forms.CharField(help_text="Enter Region name")
+    region_data = forms.CharField(label="Enter Region name")
     def clean_region_data(self):
         data = self.cleaned_data['region_data']
         data.lower()
         return data
+    add_more = forms.BooleanField(label="Add another Region?")
+    add_more.required = False
 
 class exportForm(forms.Form):
 
-    attributes_data = forms.MultipleChoiceField(choices=attributes)
-    year_data = forms.IntegerField()
+    attributes_data = forms.MultipleChoiceField(label="Select Attributes to view",choices=attributes)
+    year_data = forms.IntegerField(label="Get data from years")
 
     def clean_year_data(self):
         data = self.cleaned_data['year_data']
@@ -38,14 +40,14 @@ class exportForm(forms.Form):
             raise ValidationError(_('Invalid year - data not available for year'))
         return data
 
-    leapYear_data = forms.BooleanField()
+    leapYear_data = forms.BooleanField(label="Include Leap Year?")
 
-    interval_data = forms.ChoiceField(choices=(("30","30"),("60","60")))
+    interval_data = forms.ChoiceField(label= "Select Interval (Minutes) ",choices=(("30","30"),("60","60")))
 
-    utc_data = forms.BooleanField()
+    utc_data = forms.BooleanField(label="Use UTC data points?")
 
 
-    name_data = forms.CharField()
+    name_data = forms.CharField(label="Name (Not Required)")
     name_data.required = False
 
 
@@ -54,20 +56,20 @@ class exportForm(forms.Form):
         data.lower()
         return data
 
-    reason_data = forms.CharField()
+    reason_data = forms.CharField(label="Reason (Not Required)")
     reason_data.required = False
     def clean_reason_data(self):
         data = self.cleaned_data['reason_data']
         data.lower()
         return data
 
-    affiliation_data = forms.CharField()
+    affiliation_data = forms.CharField(label="Affiliation (Not Required)")
     affiliation_data.required = False
     def clean_affiliation_data(self):
         data = self.cleaned_data['affiliation_data']
         data.lower()
         return data
-    email_data = forms.CharField()
+    email_data = forms.CharField(label="Email ")
     def clean_email_data(self):
         data = self.cleaned_data['email_data']
         if not "@" in data:
@@ -75,4 +77,4 @@ class exportForm(forms.Form):
         return data
 
 class attributeFilterForm(forms.Form):
-    attributes_data = forms.MultipleChoiceField(choices=attributes)
+    attributes_data = forms.MultipleChoiceField(label="Select Attributes to filter data by",choices=attributes)
