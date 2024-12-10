@@ -24,8 +24,7 @@ class geocodeForm(forms.Form):
         data = self.cleaned_data['region_data']
         data.lower()
         return data
-    add_more = forms.BooleanField(label="Add another Region?")
-    add_more.required = False
+
 
 class exportForm(forms.Form):
 

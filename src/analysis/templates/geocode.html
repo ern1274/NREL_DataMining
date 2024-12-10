@@ -23,7 +23,19 @@
 
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ geo_form.as_p }}
     <input type="submit" value="Add Region">
 </form>
+
+<form action='reset_points' method='POST'>
+    {% csrf_token %}
+<button type='submit'> Clear Regions</button>
+</form>
+
+<form action='preverify_export' method='POST'>
+    {% csrf_token %}
+<button type='submit'> Next Form</button>
+</form>
+
+
 </html>

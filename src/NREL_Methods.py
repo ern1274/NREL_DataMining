@@ -35,10 +35,12 @@ def geocodeAddress(region, country):
     res.close()
     conn.close()
     jDict = json.loads(data.decode('utf-8'))
+    data.decode()
     if 'error' not in jDict.keys():
-        jDict = jDict['data'][0]
-        lat, lon = jDict['latitude'], jDict['longitude']
-        return [lon, lat] # supposed to be ordered lon then lat
+        if len(jDict['data']) > 0:
+            jDict = jDict['data'][0]
+            lat, lon = jDict['latitude'], jDict['longitude']
+            return [lon, lat] # supposed to be ordered lon then lat
     print("Region and Country does not exist")
     return None
 
