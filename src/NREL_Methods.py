@@ -116,8 +116,8 @@ def exportToDF(points, regions):
             year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email, attr=attributes)
 
         # Return just the first 2 lines to get metadata:
-        #print(link)
-        info = pd.read_csv(link, nrows=1)
+        print(link)
+        #info = pd.read_csv(link, nrows=1)
         # See metadata for specified properties, e.g., timezone and elevation
         #timezone, elevation = info['Local Time Zone'], info['Elevation']
         #print(info)
@@ -127,4 +127,86 @@ def exportToDF(points, regions):
                 attr=attributes), skiprows=2)
         country_dfs[country][region] = df
         print("Region and Country "+regions[i] + " df downloaded")
+    return country_dfs
+"""
+exportToDF: 
+    Forms a data request based on pre-established values and downloads data
+    into pandas DataFrame object and returns it
+"""
+def exportToDF_api(info):
+    points = convertPointsToString(info['points'])
+    # Set the attributes to extract (e.g., dhi, ghi, etc.), separated by commas.
+    attributes = str(info['attributes'])
+    # Choose year of data
+    year = str(info['year'])
+    # Set leap year to true or false. True will return leap day data if present, false will not.
+    leap_year = str(info['leap_year'])
+    if info['leap_year']:
+        leap_year = "true"
+    else:
+        leap_year = "false"
+    # Set time interval in minutes, i.e., '30' is half hour intervals. Valid intervals are 30 & 60.
+    interval = str(info['interval'])
+    # Specify Coordinated Universal Time (UTC), 'true' will use UTC, 'false' will use the local time zone of the data.
+    # NOTE: In order to use the NSRDB data in SAM, you must specify UTC as 'false'. SAM requires the data to be in the
+    # local time zone.
+    utc = str(info['utc'])
+    if info['utc']:
+        utc = "true"
+    else:
+        utc = "false"
+
+    # Your full name, use '+' instead of spaces.
+    your_name = str(info['name'])
+    if your_name == "":
+        your_name = "not+provided"
+    else:
+        your_name = your_name.replace(' ', '+')
+
+
+    # Your reason for using the NSRDB.
+    reason_for_use = str(info['reason'])
+    if reason_for_use == "":
+        reason_for_use = "not+provided"
+    else:
+        reason_for_use.replace(' ', '+')
+
+    # Your affiliation
+    your_affiliation = str(info['affiliation'])
+    if your_affiliation == "":
+        your_affiliation = "not+provided"
+    else:
+        your_affiliation.replace(' ', '+')
+
+    email_str = str(info['email'])
+
+
+    country_dfs = {}
+    for i in range(len(points)):
+        point = points[i]
+        country, region = info['regions'][i].split(',')
+        #print(region)
+        #print(country)
+        if country not in country_dfs.keys():
+            country_dfs[country] = {}
+        link = url+'&api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
+            year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email_str, attr=attributes)
+
+        # Return just the first 2 lines to get metadata:
+        print(link)
+        metadata = pd.read_csv(link, nrows=1)
+        print(metadata)
+
+        # See metadata for specified properties, e.g., timezone and elevation
+        #timezone, elevation = info['Local Time Zone'], info['Elevation']
+        #print(info)
+        df = pd.read_csv(
+            url+'api_key={api}&wkt=POINT({point})&names={year}&leap_day={leap}&interval={interval}&utc={utc}&full_name={name}&affiliation={affiliation}&reason={reason}&attributes={attr}&email={email}'.format(
+                year=year, point=point, leap=leap_year, interval=interval, utc=utc, name=your_name, affiliation=your_affiliation, reason=reason_for_use, api=query_api_key, email=email_str,
+                attr=attributes), skiprows=2)
+        print("printing original")
+        print(df)
+        print("done")
+        country_dfs[country][region] = df.to_dict(orient='list')
+        print("Region and Country "+info['regions'][i] + " df downloaded")
     return country_dfs

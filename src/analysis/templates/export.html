@@ -4,9 +4,32 @@
     <meta charset="UTF-8">
     <title>Export Form</title>
 </head>
+<p>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if export_form.errors %}
+    <div class="alert alert-danger">
+        {{ form.errors }}
+    </div>
+    {% endif %}
+
+    Regions selected:
+    {% for region in regions %}
+        <div class="regionIterator">
+            {{ region }}
+        </div>
+    {% endfor %}
+</p>
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ export_form.as_p }}
     <input type="submit" value="Submit">
 </form>
+
 </html>
