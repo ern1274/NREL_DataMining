@@ -6,13 +6,13 @@ from django.utils.translation import gettext_lazy as _
 
 year_max_limit = 2022
 year_min_limit = 2010
-forms_attributes = (("ghi","GHI"),
-              ("dhi","DHI"),
-              ("dni","DNI"),
-              ("wind_speed","Wind Speed"),
-              ("air_temperature","Air Temperature"),
-              ("solar_zenith_angle","Solar Zenith Angle"))
-forms_attributes_string = "ghi," + "dhi," + "wind_speed," + "air_temperature,"+ "solar_zenith_angle"
+forms_attributes = (("GHI","GHI"),
+              ("DHI","DHI"),
+              ("DNI","DNI"),
+              ("Wind Speed","Wind Speed"),
+              ("Temperature","Air Temperature"),
+              ("Solar Zenith Angle","Solar Zenith Angle"))
+forms_attributes_string = "GHI," + "DHI," + "Wind Speed," + "Air Temperature,"+ "Solar Zenith Angle"
 
 class geocodeForm(forms.Form):
     country_data = forms.CharField(label="Enter a Country in its abbreviated form")
@@ -30,7 +30,7 @@ class geocodeForm(forms.Form):
 class exportForm(forms.Form):
     all_attributes_data = forms.BooleanField(label="All Attributes")
     all_attributes_data.required = False
-    attributes_data = forms.MultipleChoiceField(label="Select Attributes to view (ignore if selected all)",choices=forms_attributes)
+    attributes_data = forms.MultipleChoiceField(label="Select Attributes to view (ignore if selected all)",choices=forms_attributes,widget=forms.CheckboxSelectMultiple)
     attributes_data.required = False
     year_data = forms.IntegerField(label="Get data from years")
 
@@ -90,4 +90,6 @@ class exportForm(forms.Form):
         return data
 
 class attributeFilterForm(forms.Form):
-    attributes_data = forms.MultipleChoiceField(label="Select Attributes to filter data by",choices=forms_attributes)
+    attributes_data = forms.MultipleChoiceField(label="Select Attributes to filter data by",choices=forms_attributes,widget=forms.CheckboxSelectMultiple)
+
+

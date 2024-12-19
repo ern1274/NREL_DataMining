@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from .forms import geocodeForm, exportForm, attributeFilterForm, forms_attributes_string
 from NREL_DataMining.src.NREL_Methods import geocodeAddress, exportToDF_api
+from NREL_DataMining.src.Data_Preprocess import organize_dfs
 from django.contrib import messages
 import pandas as pd
 
@@ -140,11 +141,49 @@ def export_view(request):
     return render(request, "export.html", context)
 
 def attribute_filter_view(request):
+    if not request.session.has_key('export_df'):
+        messages.error(request, "Fill out export form first")
+        return HttpResponseRedirect('/analysis/export')
+
     if request.method == "POST":
         form = attributeFilterForm(request.POST)
         if form.is_valid():
-            attributes = str(form.cleaned_data['attributes_data'])
-            return HttpResponse("Attributes selected: " + attributes)
+            attributes = form.cleaned_data['attributes_data']
+            organized_df = organize_dfs(request.session.get('export_df'), attributes)
+            organized_df_string = ""
+
+            for country in organized_df.keys():
+                organized_df_string += "\n\n" +country + "\n"
+                if country == 'ALL':
+                    organized_df_string += recurse_organized_string(attributes,organized_df[country], 0)
+                    continue
+                for region in organized_df[country].keys():
+                    organized_df_string += "\n" + region + "\n"
+                    organized_df_string += recurse_organized_string(attributes,organized_df[country][region], 0)
+                organized_df_string += "\n\n"
+            # For display purposes
+            #request.session['organized_df_string'] = organized_df_string
+            #request.session['organized_df'] = organized_df
+            return HttpResponse(organized_df_string,content_type="text/plain")
 
     context = {'form': attributeFilterForm()}
     return render(request, "attribute_filter.html", context)
+
+def recurse_organized_string(attributes, data, ind):
+    string = ""
+    if len(attributes) == ind:
+        return str(data)
+
+    string += "\n"
+    string += "\t"*ind
+    string += attributes[ind] + "\n"
+
+    for assignment in data.keys():
+        string += "\n\n"
+        string += "\t"*ind
+        string += str(assignment) + "\n"
+
+        string += "\n"
+        string += "\t" * ind
+        string += recurse_organized_string(attributes,data[assignment],ind+1)
+    return string

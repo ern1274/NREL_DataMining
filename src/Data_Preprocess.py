@@ -229,6 +229,9 @@ def organize_dfs(dfs, attributes):
             organized_df[country] = {}
         for region in dfs[country].keys():
             regional_df = dfs[country][region]
+            if not isinstance(regional_df,pd.DataFrame):
+                regional_df = pd.DataFrame.from_dict(data=regional_df, orient='columns')
+
             if len(attributes) != 0:
                 result = organize_by_attr(regional_df, attributes)
                 organized_df[country][region] = result
