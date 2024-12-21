@@ -6,13 +6,13 @@ from django.utils.translation import gettext_lazy as _
 
 year_max_limit = 2022
 year_min_limit = 2010
-forms_attributes = (("GHI","GHI"),
-              ("DHI","DHI"),
-              ("DNI","DNI"),
-              ("Wind Speed","Wind Speed"),
-              ("Temperature","Air Temperature"),
-              ("Solar Zenith Angle","Solar Zenith Angle"))
-forms_attributes_string = "GHI," + "DHI," + "Wind Speed," + "Air Temperature,"+ "Solar Zenith Angle"
+forms_attributes = (("ghi","GHI"),
+              ("dhi","DHI"),
+              ("dni","DNI"),
+              ("wind_speed","Wind Speed"),
+              ("air_temperature","Air Temperature"),
+              ("solar_zenith_angle","Solar Zenith Angle"))
+forms_attributes_string = "ghi," + "dhi," +"dni," + "wind_speed," + "air_temperature,"+ "solar_zenith_angle"
 
 class geocodeForm(forms.Form):
     country_data = forms.CharField(label="Enter a Country in its abbreviated form")
@@ -90,6 +90,17 @@ class exportForm(forms.Form):
         return data
 
 class attributeFilterForm(forms.Form):
-    attributes_data = forms.MultipleChoiceField(label="Select Attributes to filter data by",choices=forms_attributes,widget=forms.CheckboxSelectMultiple)
+    attribute_data = forms.ChoiceField(label="Select Attributes to filter data by",required=False, choices=forms_attributes,widget=forms.RadioSelect)
+    def clean_attribute_data(self):
+        data = self.cleaned_data['attribute_data']
+        if data == "wind_speed":
+            data = "Wind Speed"
+        elif data == "air_temperature":
+            data = "Temperature"
+        elif data == "solar_zenith_angle":
+            data = "Solar Zenith Angle"
+        else:
+            data = data.upper()
+        return data
 
 

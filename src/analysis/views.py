@@ -59,15 +59,11 @@ def reset_region_and_points(request):
     request.session['region_points'] = []
     return HttpResponseRedirect('/analysis/geocode')
 
-def preverify_export(request):
-    # Verify there is at least one region
-    if len(request.session.get('regions')) >= 1:
-        return HttpResponseRedirect('/analysis/export')
-    messages.error(request, "Add at least 1 country and region")
-    return HttpResponseRedirect('/analysis/geocode')
-
-
 def export_view(request):
+    if 'regions' not in request.session or not len(request.session.get('regions')) >= 1:
+        messages.error(request, "Add at least 1 country and region")
+        return HttpResponseRedirect('/analysis/geocode')
+
     if request.method == "POST":
         form = exportForm(request.POST)
         if form.is_valid():
@@ -141,33 +137,50 @@ def export_view(request):
     return render(request, "export.html", context)
 
 def attribute_filter_view(request):
-    if not request.session.has_key('export_df'):
+    if not len(request.session.get('regions')) >= 1:
+        messages.error(request, "Add a region first")
+        return HttpResponseRedirect('/analysis/geocode')
+
+    if 'export_df' not in request.session:
         messages.error(request, "Fill out export form first")
         return HttpResponseRedirect('/analysis/export')
+
+    if 'order_filt_attribs' not in request.session:
+        reset_filter_attributes(request)
 
     if request.method == "POST":
         form = attributeFilterForm(request.POST)
         if form.is_valid():
-            attributes = form.cleaned_data['attributes_data']
-            organized_df = organize_dfs(request.session.get('export_df'), attributes)
-            organized_df_string = ""
+            attribute = form.cleaned_data['attribute_data']
+            if attribute in request.session.get('order_filt_attribs'):
+                messages.error(request, "Already selected this attribute")
+            elif attribute != '':
+                arr = request.session.get('order_filt_attribs')
+                arr.append(attribute)
+                request.session['order_filt_attribs'] = arr
+            return HttpResponseRedirect(request.path_info)
 
-            for country in organized_df.keys():
-                organized_df_string += "\n\n" +country + "\n"
-                if country == 'ALL':
-                    organized_df_string += recurse_organized_string(attributes,organized_df[country], 0)
-                    continue
-                for region in organized_df[country].keys():
-                    organized_df_string += "\n" + region + "\n"
-                    organized_df_string += recurse_organized_string(attributes,organized_df[country][region], 0)
-                organized_df_string += "\n\n"
-            # For display purposes
-            #request.session['organized_df_string'] = organized_df_string
-            #request.session['organized_df'] = organized_df
-            return HttpResponse(organized_df_string,content_type="text/plain")
+    context = {'form': attributeFilterForm(),
+               'attributes': request.session.get('order_filt_attribs')}
 
-    context = {'form': attributeFilterForm()}
     return render(request, "attribute_filter.html", context)
+
+def reset_filter_attributes(request):
+    request.session['order_filt_attribs'] = []
+    return HttpResponseRedirect('/analysis/attribute_filter')
+
+def delete_filter_attribute(request):
+    form = attributeFilterForm(request.POST)
+    if form.is_valid():
+        attribute_to_delete = form.cleaned_data['attribute_data']
+        if attribute_to_delete in request.session['order_filt_attribs']:
+            arr = request.session['order_filt_attribs']
+            arr.remove(attribute_to_delete)
+            request.session['order_filt_attribs'] = arr
+        else:
+            messages.error(request, "Attribute hasn't been selected")
+    return HttpResponseRedirect('/analysis/attribute_filter')
+
 
 def recurse_organized_string(attributes, data, ind):
     string = ""
@@ -187,3 +200,30 @@ def recurse_organized_string(attributes, data, ind):
         string += "\t" * ind
         string += recurse_organized_string(attributes,data[assignment],ind+1)
     return string
+
+def sorted_results_view(request):
+    # Don't need regions at this point
+    #if not len(request.session.get('regions')) >= 1:
+    #    messages.error(request, "Add a region first")
+    if 'export_df' not in request.session:
+        messages.error(request, "Fill out export form first")
+        return HttpResponseRedirect('/analysis/export')
+    if 'order_filt_attribs' not in request.session:
+        messages.error(request, "Add attributes to filter the data by (NOT REQUIRED)")
+        return HttpResponseRedirect('/analysis/attribute_filter')
+    organized_df = organize_dfs(request.session.get('export_df'), request.session.get('order_filt_attribs'))
+    organized_df_string = ""
+
+    for country in organized_df.keys():
+        organized_df_string += "\n\n" + country + "\n"
+        if country == 'ALL':
+            organized_df_string += recurse_organized_string(request.session.get('order_filt_attribs'), organized_df[country], 0)
+            continue
+        for region in organized_df[country].keys():
+            organized_df_string += "\n" + region + "\n"
+            organized_df_string += recurse_organized_string(request.session.get('order_filt_attribs'), organized_df[country][region], 0)
+        organized_df_string += "\n\n"
+    # NEXT STEP: SET UP HTML FILE TO PROPERLY DISPLAY ORGANIZED_DF
+    # request.session['organized_df_string'] = organized_df_string
+    # request.session['organized_df'] = organized_df
+    return HttpResponse(organized_df_string,content_type="text/plain")

@@ -4,9 +4,28 @@
     <meta charset="UTF-8">
     <title>Attribute Filter Form</title>
 </head>
+<p>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    Attributes selected so far:
+    {% for attribute in attributes %}
+        <div class="attrIterator">
+            {{ attribute }}
+        </div>
+    {% endfor %}
+</p>
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="Add Attribute">
+    <input type="submit" formaction="delete_filter_attribute" value="Remove Attribute">
+    <input type="submit" formaction="reset_filter_attributes" value="Clear Attributes">
+    <input type="submit" formaction="sorted_results" value="Next Form">
 </form>
 </html>
